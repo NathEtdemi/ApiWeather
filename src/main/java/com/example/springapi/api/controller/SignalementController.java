@@ -1,6 +1,7 @@
 package com.example.springapi.api.controller;
 
 import com.example.springapi.api.dto.SignalementDto;
+import com.example.springapi.api.model.Signalement;
 import com.example.springapi.service.SignalementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,15 +55,17 @@ public class SignalementController {
     @PostMapping
     public ResponseEntity<SignalementDto> createSignalement(@RequestBody @Valid SignalementDto signalementDto) {
         try {
-            SignalementDto createdSignalement = signalementService.createSignalement(signalementDto);
+            SignalementDto createdSignalementDto = signalementService.createSignalement(signalementDto);
+
             return ResponseEntity
-                    .created(new URI("/api/signalement/" + createdSignalement.getId()))
-                    .body(createdSignalement);
+                    .created(new URI("/api/signalement/" + createdSignalementDto.getId()))
+                    .body(createdSignalementDto);
         } catch (Exception exception) {
             logger.error("Problème dans la base de données", exception);
             return ResponseEntity.internalServerError().body(null);
         }
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<SignalementDto> editSignalement(@PathVariable Long id, @RequestBody @Valid SignalementDto signalementDto) {
@@ -86,6 +89,23 @@ public class SignalementController {
         } catch (Exception exception) {
             logger.error("Problème dans la base de données", exception);
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/a-proximite")
+    public ResponseEntity<List<SignalementDto>> getReportsNearby(@RequestParam double userLat,
+                                                                 @RequestParam double userLon,
+                                                                 @RequestParam double radius) {
+        try {
+            List<SignalementDto> nearbyReports = signalementService.findReportsNearby(userLat, userLon, radius);
+            if (nearbyReports.isEmpty()) {
+                logger.warn("Aucun signalement à proximité trouvé");
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(nearbyReports);
+        } catch (Exception exception) {
+            logger.error("Problème dans la base de données", exception);
+            return ResponseEntity.internalServerError().body(null);
         }
     }
 }

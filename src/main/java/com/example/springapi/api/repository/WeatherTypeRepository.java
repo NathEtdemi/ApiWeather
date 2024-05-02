@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WeatherTypeRepository extends JpaRepository<WeatherType, Long> {
+    WeatherType findByName(String name);
 }

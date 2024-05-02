@@ -48,4 +48,8 @@ public class WeatherTypeService {
     public void deleteWeatherType(Long id) {
         weatherTypeRepository.deleteById(id);
     }
+
+    public WeatherType findByName(String name) {
+        return weatherTypeRepository.findByName(name);
+    }
 }
